@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+/* import React, { useEffect } from "react";
 // ... other imports
 
 export default function Header() {
@@ -18,4 +18,6 @@ export default function Header() {
   return (
     // ... your existing JSX
   );
-}
+} */
+/* 
+   */
