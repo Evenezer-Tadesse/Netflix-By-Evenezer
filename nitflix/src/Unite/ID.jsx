@@ -1,7 +1,7 @@
 export default {
-  action: 28,
-  comedy: 35,
-  horror: 27,
-  romance: 10749,
-  documentary: 99,
+  action: 10,
+  comedy: 10,
+  horror: 10,
+  romance: 10,
+  documentary: 10,
 };

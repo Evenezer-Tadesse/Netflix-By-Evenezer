@@ -3,6 +3,10 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.1.0",
-    "@mui/material": "^7.1.0"
+    "@mui/material": "^7.1.0",
+    "movie": "^1.0.1",
+    "react-player": "^2.16.0",
+    "react-youtube": "^10.1.0",
+    "trailers": "^0.0.1"
   }
 }
