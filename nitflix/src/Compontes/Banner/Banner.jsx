@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from "react";
-import axios from "../../Unite/Axiose"; // Your configured axios instance
-import "./Banner.css";
+import React, { useState, useEffect } from "react";
+import axios from "../../Unite/Axiose";
+import "./banner.css";
 
 function Banner() {
   const [movie, setMovie] = useState(null);
 
   useEffect(() => {
-    async function fetchMovie() {
-      const response = await axios.get("/discover/tv?with_networks=213");
-      const randomMovie =
-        response.data.results[
-          Math.floor(Math.random() * response.data.results.length)
-        ];
-      setMovie(randomMovie);
+    async function fetchData() {
+      try {
+        const request = await axios.get("/discover/tv?with_networks=213");
+        const results = request.data.results;
+        const randomMovie = results[Math.floor(Math.random() * results.length)];
+        setMovie(randomMovie);
+      } catch (error) {
+        console.error("Error fetching banner movie:", error);
+      }
     }
-    fetchMovie();
+    fetchData();
   }, []);
 
   function truncate(str, n) {
@@ -33,13 +35,13 @@ function Banner() {
           {movie?.title || movie?.name || movie?.original_name}
         </h1>
         <div className="banner__buttons">
-          <button className="banner__button">Play</button>
-          <button className="banner__button">My List</button>
+          <button className="banner__button">
+            <i className="fas fa-info-circle"></i> More Info
+          </button>
         </div>
         <p className="banner__description">{truncate(movie?.overview, 150)}</p>
       </div>
-      <div className="banner__fadeBottom" />
-      <div className="banner__fadeShadow" />
+      <div className="banner--fadeBottom" />
     </header>
   );
 }
