@@ -1,17 +1,31 @@
 // Header.jsx
-import React from "react";
+import React, { useState } from "react";
 import "../Header/header.css";
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SearchIcon from "@mui/icons-material/Search";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <header className="header">
       <div className="header__content">
         <div className="header__left">
           <h1 className="header__logo">Netflix</h1>
-          <nav className="header__nav">
+          {/* Hamburger menu for mobile */}
+          <button className="header__mobile-menu" onClick={toggleMenu}>
+            {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+          <nav
+            className={`header__nav ${isMenuOpen ? "header__nav--open" : ""}`}
+          >
             <ul className="header__nav-list">
               <li className="header__nav-item">Home</li>
               <li className="header__nav-item">TV Shows</li>

@@ -6,11 +6,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --base=https://evenezer-tadesse.github.io/Netflix-By-Evenezer/",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist -b gh-pages -r https://github.com/Evenezer-Tadesse/Netflix-By-Evenezer.git"
   },
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.27.1",

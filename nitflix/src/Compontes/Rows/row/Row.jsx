@@ -8,19 +8,22 @@ const Row = ({ title, fetchUrl, isLarge = false }) => {
   const [trailerUrl, setTrailerUrl] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [showScrollButtons, setShowScrollButtons] = useState(false);
+  const [imageErrors, setImageErrors] = useState({});
   const rowRef = useRef(null);
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         const response = await axios.get(fetchUrl);
-        setMovies(response.data.results);
+        setMovies(response.data.results || []);
       } catch (error) {
         console.error("Error fetching movies:", error);
+        setMovies([]); // Set empty array if fetch fails
       }
     };
     fetchMovies();
   }, [fetchUrl]);
+
   const handleClick = async (movie) => {
     // Toggle if clicking the same movie
     if (selectedId === movie.id) {
@@ -34,11 +37,12 @@ const Row = ({ title, fetchUrl, isLarge = false }) => {
 
     try {
       const response = await axios.get(`/movie/${movie.id}/videos`);
-      const trailers = response.data.results.filter(
-        (vid) =>
-          vid.site === "YouTube" &&
-          (vid.type === "Trailer" || vid.type === "Teaser")
-      );
+      const trailers =
+        response.data.results?.filter(
+          (vid) =>
+            vid.site === "YouTube" &&
+            (vid.type === "Trailer" || vid.type === "Teaser")
+        ) || [];
 
       if (trailers.length > 0) {
         // Sort by size to get highest quality trailer
@@ -52,6 +56,10 @@ const Row = ({ title, fetchUrl, isLarge = false }) => {
       console.error("Failed to fetch trailer:", error);
       setTrailerUrl("error");
     }
+  };
+
+  const handleImageError = (movieId) => {
+    setImageErrors((prev) => ({ ...prev, [movieId]: true }));
   };
 
   const scroll = (direction) => {
@@ -102,17 +110,20 @@ const Row = ({ title, fetchUrl, isLarge = false }) => {
               }`}
               onClick={() => handleClick(movie)}
             >
-              <img
-                src={`https://image.tmdb.org/t/p/w500${
-                  isLarge ? movie.poster_path : movie.backdrop_path
-                }`}
-                alt={movie.title || movie.name}
-                loading="lazy"
-                onError={(e) => {
-                  e.target.src = "/fallback-image.jpg";
-                  e.target.className = "movie-poster-error";
-                }}
-              />
+              {imageErrors[movie.id] ? (
+                <div className="image-fallback">
+                  <span>{movie.title || movie.name}</span>
+                </div>
+              ) : (
+                <img
+                  src={`https://image.tmdb.org/t/p/w500${
+                    isLarge ? movie.poster_path : movie.backdrop_path
+                  }`}
+                  alt={movie.title || movie.name}
+                  loading="lazy"
+                  onError={() => handleImageError(movie.id)}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -128,28 +139,15 @@ const Row = ({ title, fetchUrl, isLarge = false }) => {
         )}
       </div>
 
-      {trailerUrl === "loading" ? (
+      {trailerUrl === "loading" && (
         <div className="trailer-loading">
           <div className="loading-spinner"></div>
         </div>
-      ) : trailerUrl ? (
-        <div className="trailer-container">
-          <ReactPlayer
-            url={`https://www.youtube.com/watch?v=${trailerUrl}`}
-            width="100%"
-            height="100%"
-            controls
-            playing
-            config={{
-              youtube: {
-                playerVars: {
-                  modestbranding: 1,
-                  rel: 0,
-                  color: "white",
-                },
-              },
-            }}
-          />
+      )}
+
+      {trailerUrl === "no-trailer" && (
+        <div className="trailer-fallback">
+          <p>No trailer available for this movie</p>
           <button
             className="close-trailer"
             onClick={() => setTrailerUrl("")}
@@ -158,7 +156,52 @@ const Row = ({ title, fetchUrl, isLarge = false }) => {
             ×
           </button>
         </div>
-      ) : null}
+      )}
+
+      {trailerUrl === "error" && (
+        <div className="trailer-fallback error">
+          <p>Failed to load trailer. Please try again later.</p>
+          <button
+            className="close-trailer"
+            onClick={() => setTrailerUrl("")}
+            aria-label="Close trailer"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {trailerUrl &&
+        trailerUrl !== "loading" &&
+        trailerUrl !== "no-trailer" &&
+        trailerUrl !== "error" && (
+          <div className="trailer-container">
+            <ReactPlayer
+              url={`https://www.youtube.com/watch?v=${trailerUrl}`}
+              width="100%"
+              height="100%"
+              controls
+              playing
+              onError={() => setTrailerUrl("error")}
+              config={{
+                youtube: {
+                  playerVars: {
+                    modestbranding: 1,
+                    rel: 0,
+                    color: "white",
+                  },
+                },
+              }}
+            />
+            <button
+              className="close-trailer"
+              onClick={() => setTrailerUrl("")}
+              aria-label="Close trailer"
+            >
+              ×
+            </button>
+          </div>
+        )}
     </div>
   );
 };
