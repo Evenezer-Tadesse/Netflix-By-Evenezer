@@ -21,8 +21,8 @@ const Row = ({ title, fetchUrl, isLarge = false }) => {
     };
     fetchMovies();
   }, [fetchUrl]);
-
   const handleClick = async (movie) => {
+    // Toggle if clicking the same movie
     if (selectedId === movie.id) {
       setTrailerUrl("");
       setSelectedId(null);
@@ -39,10 +39,18 @@ const Row = ({ title, fetchUrl, isLarge = false }) => {
           vid.site === "YouTube" &&
           (vid.type === "Trailer" || vid.type === "Teaser")
       );
-      setTrailerUrl(trailers[0]?.key || "");
+
+      if (trailers.length > 0) {
+        // Sort by size to get highest quality trailer
+        const sortedTrailers = trailers.sort((a, b) => b.size - a.size);
+        setTrailerUrl(sortedTrailers[0].key);
+      } else {
+        // No trailer found - show fallback
+        setTrailerUrl("no-trailer");
+      }
     } catch (error) {
       console.error("Failed to fetch trailer:", error);
-      setTrailerUrl("");
+      setTrailerUrl("error");
     }
   };
 
